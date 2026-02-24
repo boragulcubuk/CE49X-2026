@@ -1,0 +1,153 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import folium
+
+# Veri yolu
+CSV_PATH = r"C:\Users\BORA\CE49X\Week03_NumPy_Pandas\istanbul_traffic_week.csv"
+
+# Veriyi oku
+df = pd.read_csv(CSV_PATH, parse_dates=["DATE_TIME"])
+
+# Köprüler için yaklaşık bounding box tanımları
+bridge_boxes = {
+    "15 Temmuz Şehitler Köprüsü": {
+        "lat_min": 41.03,
+        "lat_max": 41.06,
+        "lon_min": 29.01,
+        "lon_max": 29.05,
+    },
+    "Fatih Sultan Mehmet Köprüsü": {
+        "lat_min": 41.08,
+        "lat_max": 41.10,
+        "lon_min": 29.02,
+        "lon_max": 29.07,
+    },
+    "Yavuz Sultan Selim Köprüsü": {
+        "lat_min": 41.17,
+        "lat_max": 41.20,
+        "lon_min": 29.08,
+        "lon_max": 29.13,
+    },
+}
+
+
+def filter_bridge(df_, box):
+    """Belirli bir köprü bounding box'ına düşen sensörleri filtrele."""
+    return df_[
+        df_["LATITUDE"].between(box["lat_min"], box["lat_max"])
+        & df_["LONGITUDE"].between(box["lon_min"], box["lon_max"])
+    ]
+
+
+# DATE_TIME'ı tam saate yuvarlayarak saatlik gruplama için kolon oluştur
+df["HOUR"] = df["DATE_TIME"].dt.floor("H")
+
+bridge_hourly_list = []
+
+for bridge_name, box in bridge_boxes.items():
+    bridge_df = filter_bridge(df, box)
+    if bridge_df.empty:
+        continue
+
+    # Saatlik toplam araç sayısı (NUMBER_OF_VEHICLES) ve ortalama hız
+    hourly = (
+        bridge_df
+        .groupby("HOUR")
+        .agg(
+            avg_vehicle_count=("NUMBER_OF_VEHICLES", "mean"),
+            sum_vehicle_count=("NUMBER_OF_VEHICLES", "sum"),
+            avg_speed=("AVERAGE_SPEED", "mean"),
+        )
+        .reset_index()
+    )
+    hourly["bridge"] = bridge_name
+    bridge_hourly_list.append(hourly)
+
+# Tüm köprüler için saatlik istatistikleri birleştir
+if bridge_hourly_list:
+    bridge_hourly = pd.concat(bridge_hourly_list, ignore_index=True)
+else:
+    bridge_hourly = pd.DataFrame()
+
+print("Saatlik ortalama araç sayısı (avg_vehicle_count) ve toplam araç sayısı (sum_vehicle_count) by crossing:")
+print(bridge_hourly.head())
+
+# Basit bir zaman serisi grafiği: her köprü için ortalama saatlik araç sayısı
+if not bridge_hourly.empty:
+    plt.figure(figsize=(12, 5))
+    for bridge_name in bridge_boxes.keys():
+        sub = bridge_hourly[bridge_hourly["bridge"] == bridge_name]
+        if sub.empty:
+            continue
+        plt.plot(sub["HOUR"], sub["avg_vehicle_count"], marker=".", linewidth=1, label=bridge_name)
+
+    plt.title("Average hourly vehicle count by crossing")
+    plt.xlabel("Hour")
+    plt.ylabel("Average number of vehicles")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+# --- Harita (OpenStreetMap tabanlı) ---
+
+if not bridge_hourly.empty:
+    # Her köprü için konum olarak bounding box merkezini al
+    bridge_points = []
+    for bridge_name, box in bridge_boxes.items():
+        # İlgili köprü dataset'te var mı kontrol et
+        if not (bridge_hourly["bridge"] == bridge_name).any():
+            continue
+
+        center_lat = (box["lat_min"] + box["lat_max"]) / 2
+        center_lon = (box["lon_min"] + box["lon_max"]) / 2
+
+        # Köprü için tüm saatler üzerinden ortalama araç sayısı (genel ortalama)
+        sub = bridge_hourly[bridge_hourly["bridge"] == bridge_name]
+        overall_avg_count = sub["avg_vehicle_count"].mean()
+
+        bridge_points.append(
+            {
+                "bridge": bridge_name,
+                "lat": center_lat,
+                "lon": center_lon,
+                "overall_avg_count": overall_avg_count,
+            }
+        )
+
+    if bridge_points:
+        # Haritayı İstanbul Boğazı civarına merkezle
+        map_center_lat = sum(p["lat"] for p in bridge_points) / len(bridge_points)
+        map_center_lon = sum(p["lon"] for p in bridge_points) / len(bridge_points)
+
+        m = folium.Map(
+            location=[map_center_lat, map_center_lon],
+            zoom_start=11,
+            tiles="OpenStreetMap",  # geostreet map tarzı
+        )
+
+        # Marker boyutunu ortalama araç sayısı ile orantıla
+        max_count = max(p["overall_avg_count"] for p in bridge_points) or 1
+
+        for p in bridge_points:
+            radius = 5 + 15 * (p["overall_avg_count"] / max_count)  # 5–20 arası
+            folium.CircleMarker(
+                location=[p["lat"], p["lon"]],
+                radius=radius,
+                fill=True,
+                fill_opacity=0.7,
+                color="red",
+                popup=(
+                    f"{p['bridge']}<br>"
+                    f"Average hourly vehicle count: {p['overall_avg_count']:.1f}"
+                ),
+            ).add_to(m)
+
+        html_map_path = r"C:\Users\BORA\CE49X\Week03_NumPy_Pandas\bridge_hourly_avg_vehicle_map.html"
+        m.save(html_map_path)
+        print("Harita kaydedildi:", html_map_path)
+    else:
+        print("Köprüler için nokta üretilemedi; bounding box'ları veya veri kapsamını kontrol et.")
+else:
+    print("Bridge hourly dataframe boş; lütfen bounding box'ları veya veri dosyasını kontrol et.")
+
