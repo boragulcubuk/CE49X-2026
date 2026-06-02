@@ -1,0 +1,487 @@
+
+===== PAGE 1 =====
+CE49X
+Introduction to Data Science
+for Civil Engineering
+Final Project
+Conict Situation Monitoring for Maritime Shipping:
+Correlating Satellite Thermal Anomalies with War-Related Events
+Bo§aziçi University
+Spring 2026
+Dr. Eyuphan Koc
+April 17, 2026
+
+===== PAGE 2 =====
+CE49X - Final Project Spring 2026
+Contents
+1 Project Overview 3
+1.1 Scenario . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.2 Core Question . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.3 Project Approach . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+1.4 Learning Objectives . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+2 T eam F ormation 4
+3 Background: NASA FIRMS 4
+3.1 Accessing the Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+3.2 FIRMS Data Fields . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+4 T ask 1: Data Collection & Assembly 4
+4.1 Objective . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+4.2 NASA FIRMS Thermal Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+4.3 War & Conict News Collection . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+4.4 Deliverables for Task 1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+5 T ask 2: Spatial & T emporal Analysis 6
+5.1 Objective . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+5.2 Thermal Event Clustering . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+5.3 Temporal Patterns . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+5.4 Spatial Analysis . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+5.5 Deliverables for Task 2 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+6 T ask 3: ThermalNews Correlation & Classication 7
+6.1 Objective . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+6.2 ThermalNews Matching . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+6.3 Regional News Reporting Comparison . . . . . . . . . . . . . . . . . . . . . . . . 8
+6.4 Predicting Conict Association (ML Classication) . . . . . . . . . . . . . . . . . 8
+6.5 Deliverables for Task 3 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+7 T ask 4: Dashboard, Insights & Reection 9
+7.1 Objective . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+7.2 Multi-Panel Summary Dashboard . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+7.3 Written Discussion & Industry Implications . . . . . . . . . . . . . . . . . . . . . 10
+7.4 Deliverables for Task 4 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+8 T echnical Requirements 10
+8.1 Programming Languages and Tools . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+9 Database Storage with PostgreSQL & Docker 11
+9.1 Setting Up PostgreSQL with Docker . . . . . . . . . . . . . . . . . . . . . . . . . 11
+9.2 Connecting from Python . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+9.3 Required Tables . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+9.4 Verication . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+1
+
+===== PAGE 3 =====
+CE49X - Final Project Spring 2026
+10 Final Deliverables 12
+10.1 Code Repository . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+10.2 Project Notebook . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+10.3 Dashboard Figure . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 12
+10.4 Final Presentation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 13
+11 Grading Summary 13
+2
+
+===== PAGE 4 =====
+CE49X - Final Project Spring 2026
+1 Project Overview
+1.1 Scenario
+You are the data analytics team at a maritime shipping company . Your company operates
+cargo vessels across global trade routes, and your operating costs are heavily tied to oil and gas
+prices . When armed conicts eruptespecially in energy-producing or strategically important
+regionsfuel prices spike, shipping routes get disrupted, and insurance premiums surge.
+Your management wants an early situation monitoring system : a data pipeline that
+detects thermal anomalies from satellite imagery in conict-prone regions around the world and
+cross-references them with war and conict news to assess whether these hotspots are associated
+with armed conict activity.
+1.2 Core Question
+Can satellite-detected thermal anomalies, when correlated with conict-related news,
+serve as indicators of armed conict activity in regions that matter to global shipping
+and energy markets?
+1.3 Project Approach
+This project follows a situation monitoring pipeline:
+1. Data Collection: Acquiring worldwide satellite thermal data from NASA FIRMS and
+collecting war and conict news from web sources.
+2. Spatial-T emporal Analysis: Clustering thermal detections into discrete hotspot events,
+analyzing their geographic and temporal patterns across conict-prone regions.
+3. Correlation & Classication: Matching thermal events with conict news, analyzing
+whether conict zones exhibit distinct thermal signatures, and building ML models to
+classify thermal anomalies.
+1.4 Learning Objectives
+By completing this project, students will:
+ Independently research and identify relevant data sources for a real-world monitoring prob-
+lem.
+ Collect and integrate heterogeneous datastructured satellite data (API) and unstruc-
+tured text data (web scraping).
+ Apply geospatial analysis at a global scale: spatial clustering, cross-region comparison,
+and geographic visualization.
+ Perform statistical hypothesis testing to compare groups and interpret signicance.
+ Build and evaluate machine learning classiers on a novel prediction problem.
+ Create publication-quality multi-panel visualizations for a decision-making audience.
+ Think critically about data quality, correlation vs. causation, and analysis limitations.
+ Connect data science methods to real-world industry applications in logistics, risk assess-
+ment, and energy markets.
+3
+
+===== PAGE 5 =====
+CE49X - Final Project Spring 2026
+2 Team Formation
+ Group Size: 12 students per group
+ Collaboration: All team members must contribute equally to the project
+ Deliverables: Each group submits one nal notebook and code repository
+3 Background: NASA FIRMS
+NASA's Fire Information for Resource Management System (FIRMS) provides near
+real-time active re and thermal anomaly data derived from satellite observations. The system
+uses thermal anomaly detection algorithms applied to data from two instrument families:
+ MODIS (Moderate Resolution Imaging Spectroradiometer)  aboard the Terra and Aqua
+satellites, providing data at ∼1 km resolution since 2000.
+ VIIRS (Visible Infrared Imaging Radiometer Suite)  aboard the Suomi NPP and
+NOAA-20 satellites, providing data at ∼375 m resolution since 2012.
+Each detection record includes geographic coordinates, acquisition date and time, condence
+level, brightness temperature, and Fire Radiative Power (FRP) a measure of the ther-
+mal energy output in megawatts. Importantly, FIRMS detects any thermal anomaly, not just
+wildresthis includes industrial res, oil facility burns, explosions, and other high-temperature
+events.
+3.1 Accessing the Data
+1. Register for a free MAP_KEY at: https://firms.modaps.eosdis.nasa.gov/api/area/
+2. Use the area endpoint (bounding box) or the country endpoint (ISO3 country codes)
+to download data.
+3. The API returns up to 5 days per request . For historical data, append a date parameter
+( YYYY-MM-DD ). To collect longer periods, loop through 5-day chunks.
+4. Use _SP (Standard Processing) sources for historical data and _NRT for near real-time.
+Full API documentation: https://firms.modaps.eosdis.nasa.gov/api/area/
+3.2 FIRMS Data Fields
+4 Task 1: Data Collection & Assembly
+Points: 30/100
+4.1 Objective
+Build a multi-source dataset for conict situation monitoring: satellite thermal anomaly data
+from NASA FIRMS and war/conict-related news articles.
+4
+
+===== PAGE 6 =====
+CE49X - Final Project Spring 2026
+Field Description Example
+latitude Latitude of detection pixel center 33.312
+longitude Longitude of detection pixel center 44.361
+brightness Brightness temperature (Kelvin) 328.5
+acq_date Acquisition date 2024-08-15
+acq_time Acquisition time (HHMM UTC) 1342
+satellite Satellite name Suomi NPP
+confidence Detection condence nominal / high
+frp Fire Radiative Power (MW) 12.4
+daynight Day or night observation D / N
+Table 1: Key elds in FIRMS active re / thermal anomaly data.
+4.2 NASA FIRMS Thermal Data
+ Register for a free FIRMS MAP_KEY.
+ Select your regions of interest that are relevant to conict monitoring and global shipping.
+Justify your selection.
+ Collect VIIRS and/or MODIS data for your selected regions covering a continuous period
+of at least 6 months .
+ Minimum 5,000 thermal detection points across all regions combined.
+ Load into a Pandas DataFrame. Show df.head() , df.describe() , and check for missing
+values.
+ Clean the data:
+ Parse acq_date to a proper datetime type.
+ Filter out low-condence detections (document the threshold you choose and justify
+it).
+ Add a column identifying which region each detection belongs to.
+ Handle any missing or anomalous values.
+ Document: API endpoint(s) used, bounding boxes or country codes, date range, satellite
+instrument(s), and total records before and after cleaning.
+4.3 War & Conict News Collection
+ Collect at least 1,000 war/conict-related news articles covering your selected regions
+during the same time period as your FIRMS data.
+ Use at least 2 dierent sources . Some options:
+ News APIs: NewsAPI, GNews, MediaStack, TheNewsAPI
+ Aggregators: Google News (RSS feeds or scraping), Bing News
+ International Outlets: BBC, Reuters, Al Jazeera, Associated Press, CNN, The
+Guardian
+ Conict-F ocused Sources: The War Zone, Defense News, Liveuamap, Conict
+News
+ Wire Services: AFP, DPA, Anadolu Agency
+5
+
+===== PAGE 7 =====
+CE49X - Final Project Spring 2026
+ Search queries should include conict-related keywords such as: war, conict, mili-
+tary, bombing, airstrike, shelling, missile, attack, troops, armed, explosion,
+combat.
+ For each article, extract:
+ Title
+ Publication date
+ Source / Publisher
+ URL
+ Location mention(s) (country, city, or region name from the headline or snippet)
+ Store in a structured Pandas DataFrame with consistent column names.
+4.4 Deliverables for Task 1
+ Data collection scripts (API calls, scraping code).
+ Clean DataFrames loaded and explored ( head() , describe() , info() ).
+ Markdown cells documenting each source: URL, access date, method, and record count.
+ A written justication of your region selection (why these regions matter for shipping and
+energy).
+5 Task 2: Spatial & Temporal Analysis
+Points: 25/100
+5.1 Objective
+Transform raw satellite detection points into meaningful thermal events , then analyze their
+geographic distribution, temporal patterns, and regional characteristics.
+5.2 Thermal Event Clustering
+Raw FIRMS data contains individual satellite observation pixels. Multiple detections that are
+close in space and time typically represent a single thermal event. Your task is to cluster these
+into discrete thermal events .
+ Grouping approach: Cluster detections that fall within a spatial radius (suggested:
+510 km) and temporal window (suggested: 13 days) into one thermal event.
+ Simple approach: Group by region/country and date, then merge overlapping date
+windows.
+ Advanced approach: Use DBSCAN from scikit-learn with a Haversine distance metric
+on (lat, lon, time) features.
+ For each thermal event, compute:
+ Centroid coordinates (mean latitude, mean longitude)
+ Start date and end date
+ Duration (number of days active)
+6
+
+===== PAGE 8 =====
+CE49X - Final Project Spring 2026
+ Total FRP (sum of all detections)
+ Maximum brightness temperature
+ Number of satellite detection points
+ Region label
+ Report the total number of discrete thermal events identied per region and describe your
+clustering methodology.
+5.3 Temporal Patterns
+ Create a monthly time series of thermal event frequency, broken down by region .
+Are there temporal spikes that could correspond to conict escalation?
+ Analyze day vs. night detection patterns using the daynight column. Do conict-prone
+regions show dierent day/night ratios than others?
+ Compare thermal intensity (mean FRP) across regions and over time.
+ Produce at least 2 temporal visualizations (e.g., monthly event count by region, FRP
+trend over time).
+5.4 Spatial Analysis
+ Create a world map (or multi-region map) showing all thermal events:
+ Marker size proportional to total FRP.
+ Color mapped to region or duration.
+ Use a proper sequential colormap ( not rainbow or jet).
+ Identify and label the top hotspot clusters within each region by number of events or
+total FRP.
+ Produce at least 2 spatial visualizations .
+5.5 Deliverables for Task 2
+ Thermal event clustering code with documented methodology and parameter choices.
+ Summary DataFrame of thermal events with all computed features.
+ At least 4 publication-quality visualizations (2 temporal, 2 spatial) with axis labels, titles,
+legends, and colorbars where applicable.
+6 Task 3: ThermalNews Correlation & Classication
+Points: 30/100
+6.1 Objective
+Match thermal events with conict news, analyze whether conict-active regions show distinct
+thermal signatures, and build machine learning models to classify thermal anomalies.
+7
+
+===== PAGE 9 =====
+CE49X - Final Project Spring 2026
+6.2 ThermalNews Matching
+Develop a strategy to link conict news articles to thermal events:
+ T emporal matching: The article was published within a reasonable window of the
+thermal event (e.g., 07 days).
+ Spatial/location matching: Location mentions in the article (country, city, region)
+correspond to the thermal event's geographic area.
+ Keyword relevance: The article contains conict-related keywords conrming it is about
+armed conict activity.
+ For each thermal event, determine:
+ Conict-associated: At least one matching conict news article found.
+ No conict association: No matching articles (likely a natural re, industrial
+activity, or agricultural burn).
+ Report the conict-association rate per region: what fraction of thermal events in each
+region have matching conict news?
+6.3 Regional News Reporting Comparison
+Dierent conict zones receive very dierent levels of media attention. Analyze how news re-
+porting varies across your selected regions:
+ For each region, compute: total number of articles, number of unique sources covering it,
+average articles per thermal event, and the time dierence between satellite detection and
+the earliest news article.
+ Compare regions: which conict zones are heavily covered and which are underreported?
+ Perform a statistical hypothesis test comparing a metric of your choice (e.g., FRP,
+reporting delay, article count) between regions or between conict-associated and non-
+conict thermal events. State hypotheses, report the test statistic and p-value, and inter-
+pret the result.
+ Create at least 2 visualizations comparing coverage across regions (e.g., stacked bar chart
+of article count by region and source, heatmap of keyword frequency by region).
+ Discuss: which regions are blind spots where satellite data is especially valuable because
+news coverage is sparse?
+6.4 Predicting Conict Association (ML Classication)
+Build a classier to predict whether a thermal event is conict-associated:
+ F eatures: Total FRP, duration (days), max brightness, number of detection points,
+day/night ratio, latitude, longitude, region, month or season.
+ T arget: Conict-associated (1) vs. Non-conict (0).
+ Pipeline:
+ Train/test split (80/20, stratied by target).
+ Feature scaling with StandardScaler (t on training set only).
+8
+
+===== PAGE 10 =====
+CE49X - Final Project Spring 2026
+ Train at least 2 classiers from: Logistic Regression, Decision Tree, Naive Bayes,
+SVM.
+ Evaluation:
+ Report accuracy, precision, recall, and F1-score for each model.
+ Display the confusion matrix as a heatmap.
+ Discuss: in the context of a shipping company's risk monitoring, is it worse to miss a
+real conict (false negative) or to raise a false alarm (false positive)? How does this
+aect your choice of evaluation metric?
+ Identify the most predictive features (e.g., via logistic regression coecients or decision
+tree feature importances). What does this reveal about the characteristics of conict-
+related thermal anomalies?
+6.5 Deliverables for Task 3
+ Matching algorithm code with clearly documented logic and parameter choices.
+ Conict-association rates per region.
+ Regional news comparison with hypothesis test, coverage statistics, and blind spot discus-
+sion.
+ ML classication pipeline with evaluation metrics and confusion matrices.
+ At least 5 visualizations across all sub-tasks.
+7 Task 4: Dashboard, Insights & Reection
+Points: 15/100
+7.1 Objective
+Synthesize all ndings into a multi-panel dashboard and a written discussion connecting the
+results to real-world decision-making in maritime shipping and energy risk management.
+7.2 Multi-Panel Summary Dashboard
+Create a single multi-panel gure using matplotlib.gridspec.GridSpec :
+ At least 4 panels with at least 3 dierent chart types .
+ Must include:
+1. A world/multi-region map showing thermal events color-coded by conict association.
+2. A conict-association rate comparison across regions.
+3. A temporal trend or reporting pattern visualization.
+4. One panel of your choice highlighting a key nding.
+ At least one panel should span multiple grid cells.
+ Include an overall fig.suptitle() that communicates the main nding as a headline.
+ Save the gure as dashboard.png at 300 DPI using plt.savefig() .
+9
+
+===== PAGE 11 =====
+CE49X - Final Project Spring 2026
+7.3 Written Discussion & Industry Implications
+Answer all of the following in separate markdown cells (minimum 1 paragraph each):
+1. Key Findings: What did you discover about the relationship between satellite ther-
+mal anomalies and conict activity? Which regions showed the strongest signal? What
+surprised you?
+2. Shipping & Energy Implications: Based on your analysis, which regions pose the high-
+est risk for shipping route disruptions and energy price volatility? If you were presenting
+to your company's management, what actionable recommendations would you make for
+route planning and risk hedging?
+3. Limitations & F uture W ork: What are the main limitations of your analysis? Con-
+sider: matching accuracy, the inability to distinguish conict res from natural res purely
+by satellite data, temporal coverage, news bias toward certain regions, and confounding
+factors. What additional data or methods would improve the system?
+4. Methodology Reection: Which part of the data science pipeline was most challenging?
+What would you do dierently if you started over?
+7.4 Deliverables for Task 4
+ Multi-panel dashboard gure saved as dashboard.png .
+ Written discussion (4 sections, minimum 1 paragraph each).
+8 Technical Requirements
+8.1 Programming Languages and Tools
+ Primary Language: Python 3.8+
+ Required Libraries:
+ Data Collection: requests , BeautifulSoup ( bs4 ), optionally selenium .
+ Data Manipulation: pandas , numpy .
+ Visualization: matplotlib , seaborn .
+ Statistics: scipy.stats .
+ Machine Learning: scikit-learn (train_test_split, StandardScaler, LogisticRegres-
+sion, DecisionTreeClassier, GaussianNB, SVC, confusion_matrix, classication_report,
+cross_val_score).
+ Database: sqlalchemy , psycopg2-binary .
+ Optional Libraries (not required):
+ folium  interactive map visualizations.
+ geopy  geocoding location names to coordinates.
+ geopandas  geographic data with shapeles.
+ Environment: Jupyter Notebooks are required for this project.
+10
+
+===== PAGE 12 =====
+CE49X - Final Project Spring 2026
+9 Database Storage with PostgreSQL & Docker
+All collected and processed data must be stored in a PostgreSQL database running inside a
+Docker container. This mirrors real-world data engineering workows where data pipelines
+persist results to a database rather than at les.
+9.1 Setting Up PostgreSQL with Docker
+1. Install Docker Desktop from https://www.docker.com/products/docker-desktop/
+(available for macOS, Windows, and Linux). After installation, verify it is running:
+1 docker -- version
+2. Pull and run the PostgreSQL image. Open a terminal and run:
+1 docker run -- name ce49x - postgres \
+2 -e P O S T G R E S _ U S E R = ce49x \
+3 -e P O S T G R E S _ H O S T _ A U T H _ M E T H O D = trust \
+4 -e P O S T G R E S _ D B = c o n f l i c t _ m o n i t o r i n g \
+5 -p 5 43 2: 543 2 \
+6 -d postgres :16
+This creates a container named ce49x-postgres with:
+ Database name: conflict_monitoring
+ Username: ce49x
+ No password required (local development only)
+ Accessible on localhost:5432
+3. V erify the container is running:
+1 docker ps
+4. T o stop and restart the container later:
+1 docker stop ce49x - postgres
+2 docker start ce49x - postgres
+9.2 Connecting from Python
+Use sqlalchemy to connect to the database and write DataFrames directly:
+1 from s q l a l c h e m y import c r e a t e _ e n g i n e
+2 import pandas as pd
+3
+4 # Create c o n n e c t i o n engine
+5 engine = c r e a t e _ e n g i n e (
+6 " p o s t g r e s q l :// c e 4 9 x @ l o c a l h o s t :5432/ c o n f l i c t _ m o n i t o r i n g "
+7 )
+8
+9 # Write a D at aFr am e to a table
+10 df_firms . to_sql ( " f i r m s _ d e t e c t i o n s " , engine , if _e xi st s = " replace " , index = False )
+11 df_news . to_sql ( " n e w s _ a r t i c l e s " , engine , if_ ex is ts = " replace " , index = False )
+12
+13 # Read back from the database
+14 df = pd . read_sql ( " SELECT * FROM f i r m s _ d e t e c t i o n s LIMIT 10 " , engine )
+15 print ( df )
+11
+
+===== PAGE 13 =====
+CE49X - Final Project Spring 2026
+T able Name Contents
+firms_detections Raw FIRMS thermal detection records (cleaned)
+news_articles Collected conict news articles with metadata
+thermal_events Clustered thermal events with computed features
+event_matches Thermal eventnews article matching results
+Table 2: Required database tables.
+9.3 Required Tables
+You must create at least the following tables in your database:
+As you progress through the tasks, insert your processed DataFrames into the corresponding
+tables using to_sql() . When performing analysis in later tasks, read the data back from the
+database using pd.read_sql() rather than from local variables or CSV les. This demonstrates
+the full pipeline: collect → store → query → analyze.
+9.4 Verication
+You can verify your tables directly from the terminal:
+1 docker exec - it ce49x - postgres psql -U ce49x -d c o n f l i c t _ m o n i t o r i n g -c " \ dt "
+This lists all tables in the database. You can also run SQL queries:
+1 docker exec - it ce49x - postgres psql -U ce49x -d c o n f l i c t _ m o n i t o r i n g \
+2 -c " SELECT COUNT (*) FROM f i r m s _ d e t e c t i o n s ; "
+10 Final Deliverables
+10.1 Code Repository
+ Well-organized GitHub repository (pushed to your course fork).
+ requirements.txt or environment.yml le.
+ README.md explaining project structure, how to set up the database with Docker, and how
+to reproduce the analysis.
+ The docker run command (or a docker-compose.yml le) needed to recreate the database.
+10.2 Project Notebook
+ A single Jupyter Notebook containing all code, analysis, and written discussion.
+ The notebook must run top-to-bottom without errors (Kernel → Restart & Run All).
+ All visualizations must be publication-quality: axis labels with units, descriptive titles,
+legends, and appropriate colormaps.
+ All data sources must be cited with URLs and access dates.
+10.3 Dashboard Figure
+ dashboard.png saved at 300 DPI alongside the notebook.
+12
+
+===== PAGE 14 =====
+CE49X - Final Project Spring 2026
+10.4 Final Presentation
+Length: 1015 minutes
+ 57 minutes: main ndings and methodology
+ 35 minutes: Q&A
+ 12 minutes: conclusions and future outlook
+11 Grading Summary
+T ask Description Points
+Task 1 Data Collection & Assembly 30
+NASA FIRMS Thermal Data 15
+War & Conict News Collection 15
+Task 2 Spatial & Temporal Analysis 25
+Thermal Event Clustering 10
+Temporal Patterns 7
+Spatial Analysis 8
+Task 3 ThermalNews Correlation & Classication 30
+Matching Algorithm 10
+Regional News Reporting Comparison 15
+ML Classication 5
+Task 4 Dashboard, Insights & Reection 15
+Multi-Panel Dashboard 8
+Written Discussion 7
+T otal 100
+Table 3: Point allocation by task and sub-task.
+13

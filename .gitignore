@@ -9,7 +9,9 @@ __pycache__/
 # Instructor-only files
 CE49X_Class_Spring_2026.xls
 email_service/
-Final Project/
+Final Project/.env
+Final Project/.ipynb_checkpoints/
+Final Project/__pycache__/
 
 # Lecture PDFs and LaTeX source
 archive/
